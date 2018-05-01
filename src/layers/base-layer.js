@@ -634,13 +634,11 @@ export default class Layer {
       }
 
       // check if current selected scale is
-      // supported, if not, update to default
-      if (this.config[field]) {
-        const scaleOptions =
-          FIELD_OPTS[this.config[field].type].scale[channelScaleType];
-        if (!scaleOptions.includes(this.config[scale])) {
-          this.updateLayerConfig({[scale]: scaleOptions[0]});
-        }
+      // supported, if not, change to default
+      const scaleOptions =
+        FIELD_OPTS[this.config[field].type].scale[channelScaleType];
+      if (!scaleOptions.includes(this.config[scale])) {
+        this.updateLayerConfig({[scale]: scaleOptions[0]});
       }
     }
   }

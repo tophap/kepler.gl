@@ -742,18 +742,24 @@ export const AggregationTypeSelector = ({
   field,
   property,
   options,
-  onChange
-}) => (
-  <SidePanelSection>
-    <PanelLabel>{`Aggregate ${field ? field.name : ''} by`}</PanelLabel>
-    <ItemSelector
-      disabled={!field}
-      selectedItems={visConfig[property]}
-      options={options}
-      multiSelect={false}
-      searchable={false}
-      onChange={value => onChange({[property]: value})}
-    />
-  </SidePanelSection>
-);
+  onChangee
+}) => {
+  const aggregationOptions =
+    (field && FIELD_OPTS[field.type].aggregation[channelScaleType]) ||
+    [FIELD_OPTS.integer.aggregation[channelScaleType]];
+
+  return (
+    <SidePanelSection>
+      <PanelLabel>{`Aggregate ${field ? field.name : ''} by`}</PanelLabel>
+      <ItemSelector
+        disabled={!field}
+        selectedItems={visConfig[property]}
+        options={aggregationOptions}
+        multiSelect={false}
+        searchable={false}
+        onChange={value => onChange({[property]: value})}
+      />
+    </SidePanelSection>
+  );
+};
 /* eslint-enable max-params */

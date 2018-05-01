@@ -21,6 +21,19 @@
 import {min, max, mean, median, sum} from 'd3-array';
 import {AGGREGATION_TYPES} from 'constants/default-settings';
 
+const getOccurence = data => data.reduce((uniques, val) => {
+  uniques[val] = true;
+  return uniques;
+}, {});
+
+function getMostOrLeastOften(data, isMost) {
+  const occr = getOccurence(data);
+
+  return Object.keys(occr).reduce((prev, key) =>
+    (isMost ? occr[prev] >= occr[key] : occr[prev] <= occr[key]) ?
+      prev : key, Object.keys(occr)[0]);
+}
+
 export function aggregate(data, technique) {
   switch (technique) {
     case AGGREGATION_TYPES.average:
@@ -28,10 +41,17 @@ export function aggregate(data, technique) {
     case AGGREGATION_TYPES.countUnique:
       return Object.keys(
         data.reduce((uniques, val) => {
-          uniques[val] = true;
+          uniques[val] = uniques[val] || 0;
+          uniques[val] += 1;
           return uniques;
         }, {})
       ).length;
+    case AGGREGATION_TYPES.mostOften:
+      return getMostOrLeastOften(data, true);
+
+    case AGGREGATION_TYPES.leastOften:
+      return getMostOrLeastOften(data, false);
+
     case AGGREGATION_TYPES.maximum:
       return max(data);
     case AGGREGATION_TYPES.minimum:

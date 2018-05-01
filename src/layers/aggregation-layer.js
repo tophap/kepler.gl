@@ -119,6 +119,25 @@ export default class AggregationLayer extends Layer {
   }
 
   /**
+   * Validate aggregation type on top of basic layer visual channel validation
+   * @param channel
+   */
+  validateVisualChannel(channel) {
+    super.validateVisualChannel(channel);
+
+    const visualChannel = this.visualChannels[channel];
+    const {field, scale, channelScaleType} = visualChannel;
+
+    if (this.config[field]) {
+      const aggregationOptions =
+        FIELD_OPTS[this.config[field].type].aggregation[channelScaleType];
+
+    } else {
+
+    }
+  }
+
+  /**
    * Aggregation layer handles visual channel aggregation inside deck.gl layer
    */
   updateLayerDomain(dataset, newFilter) {

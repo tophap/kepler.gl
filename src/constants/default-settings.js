@@ -257,6 +257,33 @@ export const CHANNEL_SCALES = keyMirror({
   sizeAggr: null
 });
 
+export const AGGREGATION_TYPES = keyMirror({
+  // linear
+  average: null,
+  maximum: null,
+  minimum: null,
+  median: null,
+  sum: null,
+  // ordinal
+  countUnique: null,
+  mostOften: null,
+  leastOften: null
+});
+
+const LINEAR_AGGREGATION = [
+  AGGREGATION_TYPES.average,
+  AGGREGATION_TYPES.maximum,
+  AGGREGATION_TYPES.minimum,
+  AGGREGATION_TYPES.median,
+  AGGREGATION_TYPES.sum
+];
+
+const ORDINAL_AGGREGATION = [
+  AGGREGATION_TYPES.countUnique,
+  AGGREGATION_TYPES.mostOften,
+  AGGREGATION_TYPES.leastOften
+];
+
 export const linearFieldScaleFunctions = {
   [CHANNEL_SCALES.color]: [SCALE_TYPES.quantize, SCALE_TYPES.quantile],
   [CHANNEL_SCALES.radius]: [SCALE_TYPES.sqrt],
@@ -268,6 +295,11 @@ export const linearFieldAggrScaleFunctions = {
   [CHANNEL_SCALES.sizeAggr]: [SCALE_TYPES.linear]
 };
 
+export const LinearFieldAggrTypes = {
+  [CHANNEL_SCALES.colorAggr]: LINEAR_AGGREGATION,
+  [CHANNEL_SCALES.sizeAggr]: LINEAR_AGGREGATION
+};
+
 export const OrdinalFieldScaleFunctions = {
   [CHANNEL_SCALES.color]: [SCALE_TYPES.ordinal],
   [CHANNEL_SCALES.radius]: [SCALE_TYPES.point],
@@ -276,14 +308,24 @@ export const OrdinalFieldScaleFunctions = {
 
 export const OrdinalFieldAggrScaleFunctions = {
   // Currently doesn't support yet
-  [CHANNEL_SCALES.colorAggr]: [],
+  [CHANNEL_SCALES.colorAggr]: [SCALE_TYPES.ordinal],
   [CHANNEL_SCALES.sizeAggr]: []
+};
+
+export const OrdinalFieldAggrTypes = {
+  [CHANNEL_SCALES.colorAggr]: ORDINAL_AGGREGATION,
+  [CHANNEL_SCALES.sizeAggr]: ORDINAL_AGGREGATION
 };
 
 export const notSupportedScaleOpts = {
   [CHANNEL_SCALES.color]: [],
   [CHANNEL_SCALES.radius]: [],
   [CHANNEL_SCALES.size]: [],
+  [CHANNEL_SCALES.colorAggr]: [],
+  [CHANNEL_SCALES.sizeAggr]: []
+};
+
+export const notSupportAggrOpts = {
   [CHANNEL_SCALES.colorAggr]: [],
   [CHANNEL_SCALES.sizeAggr]: []
 };
@@ -298,6 +340,7 @@ export const FIELD_OPTS = {
       ...OrdinalFieldScaleFunctions,
       ...OrdinalFieldAggrScaleFunctions
     },
+    aggregation: OrdinalFieldAggrTypes,
     format: {
       legend: d => d
     }
@@ -308,6 +351,7 @@ export const FIELD_OPTS = {
       ...linearFieldScaleFunctions,
       ...linearFieldAggrScaleFunctions
     },
+    aggregation: LinearFieldAggrTypes,
     format: {
       legend: d => d
     }
@@ -315,6 +359,7 @@ export const FIELD_OPTS = {
   timestamp: {
     type: 'time',
     scale: linearFieldScaleFunctions,
+    aggregation: notSupportAggrOpts,
     format: {
       legend: d => d
     }
@@ -325,6 +370,7 @@ export const FIELD_OPTS = {
       ...linearFieldScaleFunctions,
       ...linearFieldAggrScaleFunctions
     },
+    aggregation: LinearFieldAggrTypes,
     format: {
       legend: d => d
     }
@@ -332,12 +378,14 @@ export const FIELD_OPTS = {
   boolean: {
     type: 'boolean',
     scale: OrdinalFieldScaleFunctions,
+    aggregation: OrdinalFieldAggrTypes,
     format: {
       legend: d => d
     }
   },
   date: {
     scale: OrdinalFieldScaleFunctions,
+    aggregation: OrdinalFieldAggrTypes,
     format: {
       legend: d => d
     }
@@ -345,6 +393,7 @@ export const FIELD_OPTS = {
   geojson: {
     type: 'geometry',
     scale: notSupportedScaleOpts,
+    aggregation: notSupportAggrOpts,
     format: {
       legend: d => '...'
     }
@@ -363,6 +412,7 @@ export const CHANNEL_SCALE_SUPPORTED_FIELDS = Object.keys(
   {}
 );
 
+console.log(CHANNEL_SCALE_SUPPORTED_FIELDS)
 // TODO: shan delete use of LAYER_TYPES
 export const LAYER_TYPES = keyMirror({
   point: null,
@@ -421,15 +471,6 @@ export const LAYER_BLENDINGS = {
     blendEquationSeparate: ['FUNC_SUBTRACT', 'FUNC_ADD']
   }
 };
-
-export const AGGREGATION_TYPES = keyMirror({
-  average: null,
-  maximum: null,
-  minimum: null,
-  median: null,
-  sum: null,
-  countUnique: null
-});
 
 export const MAX_DEFAULT_TOOLTIPS = 5;
 
