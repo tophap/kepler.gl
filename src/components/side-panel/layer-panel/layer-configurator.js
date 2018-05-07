@@ -43,6 +43,7 @@ import {LAYER_VIS_CONFIGS} from 'layers/layer-factory';
 import {capitalizeFirstLetter} from 'utils/utils';
 
 import {
+  AGGREGATION_SCALE,
   FIELD_OPTS,
   LAYER_TYPES,
   CHANNEL_SCALE_SUPPORTED_FIELDS
@@ -196,8 +197,9 @@ export default class LayerConfigurator extends Component {
         <LayerConfigGroup label={'aggregation'}>
           <AggregationTypeSelector
             {...LAYER_VIS_CONFIGS.aggregation}
-            {...visConfiguratorProps}
-            field={layer.config.colorField}
+            {...layerChannelConfigProps}
+            property={'colorAggregation'}
+            channel={layer.visualChannels.color}
           />
         </LayerConfigGroup>
       </StyledLayerVisualConfigurator>
@@ -271,9 +273,10 @@ export default class LayerConfigurator extends Component {
           />
           <AggregationTypeSelector
             {...LAYER_VIS_CONFIGS.aggregation}
-            {...visConfiguratorProps}
+            {...layerChannelConfigProps}
+            property={'colorAggregation'}
             descreiption={colorByDescription}
-            field={colorField}
+            channel={layer.visualChannels.color}
           />
           <VisConfigSlider
             {...LAYER_VIS_CONFIGS.percentile}
@@ -317,9 +320,9 @@ export default class LayerConfigurator extends Component {
           />
           <AggregationTypeSelector
             {...LAYER_VIS_CONFIGS.aggregation}
-            {...visConfiguratorProps}
+            {...layerChannelConfigProps}
             property={'sizeAggregation'}
-            field={sizeField}
+            channel={layer.visualChannels.size}
           />
           <VisConfigSlider
             {...LAYER_VIS_CONFIGS.percentile}
@@ -729,7 +732,7 @@ export const AggrColorScaleSelector = ({layer: {config}, onChange}) => (
     label="Color Scale"
     options={
       config.colorField
-        ? FIELD_OPTS[config.colorField.type].scale.colorAggr
+        ? AGGREGATION_SCALE[config.visConfig.colorAggregation]
         : FIELD_OPTS.integer.scale.colorAggr
     }
     scaleType={config.colorScale}
@@ -738,26 +741,35 @@ export const AggrColorScaleSelector = ({layer: {config}, onChange}) => (
 );
 
 export const AggregationTypeSelector = ({
-  layer: {config: {visConfig}},
-  field,
-  property,
-  options,
-  onChangee
+  layer,
+  channel,
+  onChange
 }) => {
+  const {
+    channelScaleType,
+    field,
+    aggregation
+  } = channel;
+  const selectedField = layer.config[field];
+  const {visConfig} = layer.config;
+
+  // aggregation should only be selectable when field is selected
   const aggregationOptions =
-    (field && FIELD_OPTS[field.type].aggregation[channelScaleType]) ||
-    [FIELD_OPTS.integer.aggregation[channelScaleType]];
+    (selectedField && FIELD_OPTS[selectedField.type].aggregation[channelScaleType]) || [];
 
   return (
     <SidePanelSection>
-      <PanelLabel>{`Aggregate ${field ? field.name : ''} by`}</PanelLabel>
+      <PanelLabel>{`Aggregate ${selectedField ? selectedField.name : ''} by`}</PanelLabel>
       <ItemSelector
-        disabled={!field}
-        selectedItems={visConfig[property]}
+        disabled={!selectedField}
+        selectedItems={visConfig[aggregation]}
         options={aggregationOptions}
         multiSelect={false}
         searchable={false}
-        onChange={value => onChange({[property]: value})}
+        onChange={value => onChange({visConfig: {
+          ...layer.config.visConfig,
+          [aggregation]: value
+        }}, channel.key)}
       />
     </SidePanelSection>
   );

@@ -257,18 +257,28 @@ export const CHANNEL_SCALES = keyMirror({
   sizeAggr: null
 });
 
-export const AGGREGATION_TYPES = keyMirror({
+export const AGGREGATION_TYPES = {
   // linear
-  average: null,
-  maximum: null,
-  minimum: null,
-  median: null,
-  sum: null,
+  average: 'average',
+  maximum: 'maximum',
+  minimum: 'minimum',
+  median: 'median',
+  sum: 'sum',
   // ordinal
-  countUnique: null,
-  mostOften: null,
-  leastOften: null
-});
+  mode: 'mode',
+  countUnique: 'count unique'
+};
+
+export const AGGREGATION_SCALE = {
+  [AGGREGATION_TYPES.average]: [SCALE_TYPES.quantize, SCALE_TYPES.quantile],
+  [AGGREGATION_TYPES.maximum]: [SCALE_TYPES.quantize, SCALE_TYPES.quantile],
+  [AGGREGATION_TYPES.minimum]: [SCALE_TYPES.quantize, SCALE_TYPES.quantile],
+  [AGGREGATION_TYPES.median]: [SCALE_TYPES.quantize, SCALE_TYPES.quantile],
+  [AGGREGATION_TYPES.sum]: [SCALE_TYPES.quantize, SCALE_TYPES.quantile],
+  // ordinal
+  [AGGREGATION_TYPES.mode]: [SCALE_TYPES.ordinal],
+  [AGGREGATION_TYPES.countUnique]: [SCALE_TYPES.quantize, SCALE_TYPES.quantile]
+};
 
 const LINEAR_AGGREGATION = [
   AGGREGATION_TYPES.average,
@@ -279,9 +289,8 @@ const LINEAR_AGGREGATION = [
 ];
 
 const ORDINAL_AGGREGATION = [
-  AGGREGATION_TYPES.countUnique,
-  AGGREGATION_TYPES.mostOften,
-  AGGREGATION_TYPES.leastOften
+  AGGREGATION_TYPES.mode,
+  AGGREGATION_TYPES.countUnique
 ];
 
 export const linearFieldScaleFunctions = {
@@ -307,8 +316,8 @@ export const OrdinalFieldScaleFunctions = {
 };
 
 export const OrdinalFieldAggrScaleFunctions = {
+  [CHANNEL_SCALES.colorAggr]: [SCALE_TYPES.ordinal, SCALE_TYPES.linear],
   // Currently doesn't support yet
-  [CHANNEL_SCALES.colorAggr]: [SCALE_TYPES.ordinal],
   [CHANNEL_SCALES.sizeAggr]: []
 };
 
@@ -412,7 +421,6 @@ export const CHANNEL_SCALE_SUPPORTED_FIELDS = Object.keys(
   {}
 );
 
-console.log(CHANNEL_SCALE_SUPPORTED_FIELDS)
 // TODO: shan delete use of LAYER_TYPES
 export const LAYER_TYPES = keyMirror({
   point: null,

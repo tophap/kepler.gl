@@ -22,7 +22,7 @@ import memoize from 'lodash.memoize';
 import Layer from './base-layer';
 import {hexToRgb} from 'utils/color-utils';
 import {aggregate} from 'utils/aggregate-utils';
-import {CHANNEL_SCALES} from 'constants/default-settings';
+import {CHANNEL_SCALES, FIELD_OPTS, AGGREGATION_SCALE} from 'constants/default-settings';
 
 export const pointPosAccessor = ({lat, lng}) => d => [
   d[lng.fieldIdx],
@@ -88,6 +88,7 @@ export default class AggregationLayer extends Layer {
         scale: 'colorScale',
         domain: 'colorDomain',
         range: 'colorRange',
+        aggregation: 'colorAggregation',
         key: 'color',
         channelScaleType: CHANNEL_SCALES.colorAggr,
         defaultMeasure: 'Point Count'
@@ -98,6 +99,7 @@ export default class AggregationLayer extends Layer {
         scale: 'sizeScale',
         domain: 'sizeDomain',
         range: 'sizeRange',
+        aggregation: 'sizeAggregation',
         key: 'size',
         channelScaleType: CHANNEL_SCALES.sizeAggr,
         defaultMeasure: 'Point Count',
@@ -126,14 +128,29 @@ export default class AggregationLayer extends Layer {
     super.validateVisualChannel(channel);
 
     const visualChannel = this.visualChannels[channel];
-    const {field, scale, channelScaleType} = visualChannel;
+    const {field, scale, channelScaleType, aggregation} = visualChannel;
+    let scaleOptions;
 
     if (this.config[field]) {
       const aggregationOptions =
         FIELD_OPTS[this.config[field].type].aggregation[channelScaleType];
 
+      if (!aggregationOptions.includes(this.config.visConfig[aggregation])) {
+        // current aggregation type is not supported by this field, set it to the first option
+        // set scale back to default
+        this.updateLayerVisConfig({[aggregation]: aggregationOptions[0]});
+      }
+
+      // aggregation scale
+      scaleOptions = AGGREGATION_SCALE[this.config.visConfig[aggregation]];
     } else {
 
+      // check scale
+      scaleOptions = FIELD_OPTS.integer.scale[channelScaleType];
+    }
+
+    if (!scaleOptions.includes(this.config[scale])) {
+      this.updateLayerConfig({[scale]: scaleOptions[0]});
     }
   }
 
