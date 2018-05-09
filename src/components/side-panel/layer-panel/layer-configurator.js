@@ -271,13 +271,13 @@ export default class LayerConfigurator extends Component {
             channel={layer.visualChannels.color}
             {...layerChannelConfigProps}
           />
-          <AggregationTypeSelector
+          {colorField ? <AggregationTypeSelector
             {...LAYER_VIS_CONFIGS.aggregation}
             {...layerChannelConfigProps}
             property={'colorAggregation'}
             descreiption={colorByDescription}
             channel={layer.visualChannels.color}
-          />
+          /> : null}
           <VisConfigSlider
             {...LAYER_VIS_CONFIGS.percentile}
             {...visConfiguratorProps}
@@ -694,7 +694,8 @@ export const ChannelByValueSelector = ({
     key,
     property,
     range,
-    scale
+    scale,
+    defaultMeasure
   } = channel;
   const supportedFieldTypes = CHANNEL_SCALE_SUPPORTED_FIELDS[channelScaleType];
   const supportedFields = fields.filter(({type}) =>
@@ -716,6 +717,7 @@ export const ChannelByValueSelector = ({
       id={layer.id}
       key={`${key}-channel-selector`}
       property={property}
+      placeholder={defaultMeasure || 'Select a field'}
       range={layer.config.visConfig[range]}
       scaleOptions={scaleOptions}
       scaleType={layer.config[scale]}
