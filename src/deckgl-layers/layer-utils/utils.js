@@ -19,7 +19,7 @@
 // THE SOFTWARE.
 
 import {scaleQuantize, scaleOrdinal, scaleQuantile, scaleSqrt} from 'd3-scale';
-import {notNullorUndefined, unique} from 'utils//data-utils';
+import {unique} from 'utils//data-utils';
 
 import {SCALE_TYPES} from 'constants/default-settings';
 

@@ -287,6 +287,21 @@ export default class Layer {
   }
 
   /**
+   * Get the description of a visualChannel config
+   * @param key
+   * @returns {{label: string, measure: (string|string)}}
+   */
+  getVisualChannelDescription(key) {
+    // e.g. label: Color, measure: Vehicle Type
+    return {
+      label: this.visConfigSettings[this.visualChannels[key].range].label,
+      measure: this.config[this.visualChannels[key].field]
+        ? this.config[this.visualChannels[key].field].name
+        : this.visualChannels[key].defaultMeasure
+    }
+  }
+
+  /**
    * Assign a field to layer column, return column config
    * @param key - Column Key
    * @param field - Selected field

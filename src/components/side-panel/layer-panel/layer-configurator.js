@@ -256,7 +256,7 @@ export default class LayerConfigurator extends Component {
     layerChannelConfigProps
   }) {
     const {type, config} = layer;
-    const {visConfig: {enable3d}, colorField, sizeField} = config;
+    const {visConfig: {enable3d}} = config;
     const elevationByDescription =
       'When off, height is based on count of points';
     const colorByDescription = 'When off, color is based on count of points';
@@ -271,17 +271,18 @@ export default class LayerConfigurator extends Component {
             channel={layer.visualChannels.color}
             {...layerChannelConfigProps}
           />
-          {colorField ? <AggregationTypeSelector
-            {...LAYER_VIS_CONFIGS.aggregation}
-            {...layerChannelConfigProps}
-            property={'colorAggregation'}
-            descreiption={colorByDescription}
-            channel={layer.visualChannels.color}
-          /> : null}
-          <VisConfigSlider
-            {...LAYER_VIS_CONFIGS.percentile}
-            {...visConfiguratorProps}
-          />
+          {layer.visConfigSettings.colorAggregation.condition(layer.config) ?
+            <AggregationTypeSelector
+              {...layer.visConfigSettings.colorAggregation}
+              {...layerChannelConfigProps}
+              descreiption={colorByDescription}
+              channel={layer.visualChannels.color}
+            /> : null}
+          {layer.visConfigSettings.percentile.condition(layer.config) ?
+            <VisConfigSlider
+              {...layer.visConfigSettings.percentile}
+              {...visConfiguratorProps}
+            /> : null}
           <VisConfigSlider
             {...LAYER_VIS_CONFIGS.opacity}
             {...visConfiguratorProps}
@@ -318,18 +319,17 @@ export default class LayerConfigurator extends Component {
             description={elevationByDescription}
             disabled={!enable3d}
           />
-          <AggregationTypeSelector
-            {...LAYER_VIS_CONFIGS.aggregation}
-            {...layerChannelConfigProps}
-            property={'sizeAggregation'}
-            channel={layer.visualChannels.size}
-          />
-          <VisConfigSlider
-            {...LAYER_VIS_CONFIGS.percentile}
-            {...visConfiguratorProps}
-            property={'elevationPercentile'}
-            disabled={!enable3d || (!colorField && !sizeField)}
-          />
+          {layer.visConfigSettings.sizeAggregation.condition(layer.config) ?
+            <AggregationTypeSelector
+              {...layer.visConfigSettings.sizeAggregation}
+              {...layerChannelConfigProps}
+              channel={layer.visualChannels.size}
+            /> : null}
+          {layer.visConfigSettings.elevationPercentile.condition(layer.config) ?
+            <VisConfigSlider
+              {...layer.visConfigSettings.elevationPercentile}
+              {...visConfiguratorProps}
+            /> : null}
         </LayerConfigGroup>
         <LayerConfigGroup
           {...LAYER_VIS_CONFIGS['hi-precision']}

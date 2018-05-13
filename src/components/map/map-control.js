@@ -96,7 +96,7 @@ const StyledMapControlPanel = styled.div`
 const StyledMapControlPanelContent = styled.div`
   ${props => props.theme.dropdownScrollBar} max-height: 500px;
   min-height: 100px;
-  overflow: scroll;
+  overflow: auto;
 `;
 
 const StyledMapControlPanelHeader = styled.div`
@@ -224,8 +224,7 @@ export class MapControl extends Component {
     ) : (
       <MapControlPanel
         header={'Visible layers'}
-        onClick={() => this._toggleMenuPanel('areLayersVisible')}
-      >
+        onClick={() => this._toggleMenuPanel('areLayersVisible')}>
         <MapLayerSelector layers={items} onMapToggleLayer={onMapToggleLayer} />
       </MapControlPanel>
     );
@@ -242,16 +241,14 @@ export class MapControl extends Component {
         onClick={e => {
           e.preventDefault();
           this._toggleMenuPanel('isLegendVisible');
-        }}
-      >
+        }}>
         <Legend height="22px" />
         <MapLegendTooltip id="show-legend" message={'show legend'} />
       </StyledMapControlButton>
     ) : (
       <MapControlPanel
         header={'Layer Legend'}
-        onClick={() => this._toggleMenuPanel('isLegendVisible')}
-      >
+        onClick={() => this._toggleMenuPanel('isLegendVisible')}>
         <MapLegend
           layers={items.filter(item => item.isVisible).map(item => item.layer)}
         />

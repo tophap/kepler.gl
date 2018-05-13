@@ -108,6 +108,22 @@ export default class AggregationLayer extends Layer {
     };
   }
 
+  /**
+   * Get the description of a visualChannel config
+   * @param key
+   * @returns {{label: string, measure: (string|string)}}
+   */
+  getVisualChannelDescription(key) {
+    // e.g. label: Color, measure: Average of ETA
+    const {range, field, defaultMeasure, aggregation} = this.visualChannels[key];
+    return {
+      label: this.visConfigSettings[range].label,
+      measure: this.config[field]
+        ? `${this.config.visConfig[aggregation]} of ${this.config[field].name}`
+        : defaultMeasure
+    }
+  }
+
   getHoverData(object) {
     // return aggregated object
     return object;
