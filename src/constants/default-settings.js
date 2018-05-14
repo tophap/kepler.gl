@@ -258,6 +258,8 @@ export const CHANNEL_SCALES = keyMirror({
 });
 
 export const AGGREGATION_TYPES = {
+  // default
+  count: 'count',
   // linear
   average: 'average',
   maximum: 'maximum',
@@ -269,30 +271,6 @@ export const AGGREGATION_TYPES = {
   countUnique: 'count unique'
 };
 
-export const AGGREGATION_SCALE = {
-  [AGGREGATION_TYPES.average]: [SCALE_TYPES.quantize, SCALE_TYPES.quantile],
-  [AGGREGATION_TYPES.maximum]: [SCALE_TYPES.quantize, SCALE_TYPES.quantile],
-  [AGGREGATION_TYPES.minimum]: [SCALE_TYPES.quantize, SCALE_TYPES.quantile],
-  [AGGREGATION_TYPES.median]: [SCALE_TYPES.quantize, SCALE_TYPES.quantile],
-  [AGGREGATION_TYPES.sum]: [SCALE_TYPES.quantize, SCALE_TYPES.quantile],
-  // ordinal
-  [AGGREGATION_TYPES.mode]: [SCALE_TYPES.ordinal],
-  [AGGREGATION_TYPES.countUnique]: [SCALE_TYPES.quantize, SCALE_TYPES.quantile]
-};
-
-const LINEAR_AGGREGATION = [
-  AGGREGATION_TYPES.average,
-  AGGREGATION_TYPES.maximum,
-  AGGREGATION_TYPES.minimum,
-  AGGREGATION_TYPES.median,
-  AGGREGATION_TYPES.sum
-];
-
-const ORDINAL_AGGREGATION = [
-  AGGREGATION_TYPES.mode,
-  AGGREGATION_TYPES.countUnique
-];
-
 export const linearFieldScaleFunctions = {
   [CHANNEL_SCALES.color]: [SCALE_TYPES.quantize, SCALE_TYPES.quantile],
   [CHANNEL_SCALES.radius]: [SCALE_TYPES.sqrt],
@@ -300,13 +278,21 @@ export const linearFieldScaleFunctions = {
 };
 
 export const linearFieldAggrScaleFunctions = {
-  [CHANNEL_SCALES.colorAggr]: [SCALE_TYPES.quantize, SCALE_TYPES.quantile],
-  [CHANNEL_SCALES.sizeAggr]: [SCALE_TYPES.linear]
-};
+  [CHANNEL_SCALES.colorAggr]: {
+    [AGGREGATION_TYPES.average]: [SCALE_TYPES.quantize, SCALE_TYPES.quantile],
+    [AGGREGATION_TYPES.maximum]: [SCALE_TYPES.quantize, SCALE_TYPES.quantile],
+    [AGGREGATION_TYPES.minimum]: [SCALE_TYPES.quantize, SCALE_TYPES.quantile],
+    [AGGREGATION_TYPES.median]: [SCALE_TYPES.quantize, SCALE_TYPES.quantile],
+    [AGGREGATION_TYPES.sum]: [SCALE_TYPES.quantize, SCALE_TYPES.quantile]
+  },
 
-export const LinearFieldAggrTypes = {
-  [CHANNEL_SCALES.colorAggr]: LINEAR_AGGREGATION,
-  [CHANNEL_SCALES.sizeAggr]: LINEAR_AGGREGATION
+  [CHANNEL_SCALES.sizeAggr]: {
+    [AGGREGATION_TYPES.average]: [SCALE_TYPES.linear],
+    [AGGREGATION_TYPES.maximum]: [SCALE_TYPES.linear],
+    [AGGREGATION_TYPES.minimum]: [SCALE_TYPES.linear],
+    [AGGREGATION_TYPES.median]: [SCALE_TYPES.linear],
+    [AGGREGATION_TYPES.sum]: [SCALE_TYPES.linear]
+  }
 };
 
 export const OrdinalFieldScaleFunctions = {
@@ -316,27 +302,37 @@ export const OrdinalFieldScaleFunctions = {
 };
 
 export const OrdinalFieldAggrScaleFunctions = {
-  [CHANNEL_SCALES.colorAggr]: [SCALE_TYPES.ordinal, SCALE_TYPES.linear],
-  // Currently doesn't support yet
-  [CHANNEL_SCALES.sizeAggr]: []
-};
+  // [CHANNEL_SCALES.colorAggr]: [SCALE_TYPES.ordinal, SCALE_TYPES.linear],
+  [CHANNEL_SCALES.colorAggr]: {
+    [AGGREGATION_TYPES.mode]: [SCALE_TYPES.ordinal],
+    [AGGREGATION_TYPES.countUnique]: [SCALE_TYPES.quantize, SCALE_TYPES.quantile]
+  },
 
-export const OrdinalFieldAggrTypes = {
-  [CHANNEL_SCALES.colorAggr]: ORDINAL_AGGREGATION,
-  [CHANNEL_SCALES.sizeAggr]: ORDINAL_AGGREGATION
+  // Currently doesn't support yet
+  [CHANNEL_SCALES.sizeAggr]: {}
 };
 
 export const notSupportedScaleOpts = {
   [CHANNEL_SCALES.color]: [],
   [CHANNEL_SCALES.radius]: [],
-  [CHANNEL_SCALES.size]: [],
-  [CHANNEL_SCALES.colorAggr]: [],
-  [CHANNEL_SCALES.sizeAggr]: []
+  [CHANNEL_SCALES.size]: []
 };
 
-export const notSupportAggrOpts = {
-  [CHANNEL_SCALES.colorAggr]: [],
-  [CHANNEL_SCALES.sizeAggr]: []
+export const  notSupportAggrOpts = {
+  [CHANNEL_SCALES.colorAggr]: {},
+  [CHANNEL_SCALES.sizeAggr]: {}
+};
+
+/**
+ * Default aggregation are based on ocunt
+ */
+export const DEFAULT_AGGREGATION = {
+  [CHANNEL_SCALES.colorAggr]: {
+    [AGGREGATION_TYPES.count]: [SCALE_TYPES.quantize, SCALE_TYPES.quantile],
+  },
+  [CHANNEL_SCALES.sizeAggr]: {
+    [AGGREGATION_TYPES.count]: [SCALE_TYPES.linear],
+  }
 };
 
 /**
@@ -349,7 +345,6 @@ export const FIELD_OPTS = {
       ...OrdinalFieldScaleFunctions,
       ...OrdinalFieldAggrScaleFunctions
     },
-    aggregation: OrdinalFieldAggrTypes,
     format: {
       legend: d => d
     }
@@ -360,15 +355,16 @@ export const FIELD_OPTS = {
       ...linearFieldScaleFunctions,
       ...linearFieldAggrScaleFunctions
     },
-    aggregation: LinearFieldAggrTypes,
     format: {
       legend: d => d
     }
   },
   timestamp: {
     type: 'time',
-    scale: linearFieldScaleFunctions,
-    aggregation: notSupportAggrOpts,
+    scale: {
+      ...linearFieldScaleFunctions,
+      ...notSupportAggrOpts
+    },
     format: {
       legend: d => d
     }
@@ -379,30 +375,35 @@ export const FIELD_OPTS = {
       ...linearFieldScaleFunctions,
       ...linearFieldAggrScaleFunctions
     },
-    aggregation: LinearFieldAggrTypes,
     format: {
       legend: d => d
     }
   },
   boolean: {
     type: 'boolean',
-    scale: OrdinalFieldScaleFunctions,
-    aggregation: OrdinalFieldAggrTypes,
+    scale: {
+      ...OrdinalFieldScaleFunctions,
+      ...OrdinalFieldAggrScaleFunctions
+    },
     format: {
       legend: d => d
     }
   },
   date: {
-    scale: OrdinalFieldScaleFunctions,
-    aggregation: OrdinalFieldAggrTypes,
+    scale: {
+      ...OrdinalFieldScaleFunctions,
+      ...OrdinalFieldAggrScaleFunctions
+    },
     format: {
       legend: d => d
     }
   },
   geojson: {
     type: 'geometry',
-    scale: notSupportedScaleOpts,
-    aggregation: notSupportAggrOpts,
+    scale: {
+      ...notSupportedScaleOpts,
+      ...notSupportAggrOpts
+    },
     format: {
       legend: d => '...'
     }
@@ -415,7 +416,7 @@ export const CHANNEL_SCALE_SUPPORTED_FIELDS = Object.keys(
   (accu, key) => ({
     ...accu,
     [key]: Object.keys(FIELD_OPTS).filter(
-      ft => FIELD_OPTS[ft].scale[key] && FIELD_OPTS[ft].scale[key].length
+      ft => Object.keys(FIELD_OPTS[ft].scale[key]).length
     )
   }),
   {}

@@ -181,8 +181,7 @@ export const LAYER_VIS_CONFIGS = {
     property: 'percentile',
 
     // percentile filter only makes sense with linear aggregation
-    condition: config => !config.colorField ||
-      FIELD_OPTS[config.colorField.type].aggregation === LinearFieldAggrTypes
+    condition: config => config.colorScale !== 'ordinal'
   },
   elevationPercentile: {
     type: 'number',
