@@ -20,7 +20,7 @@
 
 import keyMirror from 'keymirror';
 
-import {AGGREGATION_TYPES, FIELD_OPTS, LinearFieldAggrTypes} from 'constants/default-settings';
+import {AGGREGATION_TYPES} from 'constants/default-settings';
 import {DefaultColorRange} from 'constants/color-ranges';
 
 export const PROPERTY_GROUPS = keyMirror({
