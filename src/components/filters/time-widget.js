@@ -118,6 +118,7 @@ export class TimeWidget extends Component {
     const {
       enlargedIdx,
       enlargeFilter,
+      filters,
       filter,
       isAnyFilterAnimating,
       setFilter,
@@ -164,7 +165,12 @@ export class TimeWidget extends Component {
           </TopSectionWrapper>
           <TimeRangeFilter
             filter={filter}
-            setFilter={value => setFilter(enlargedIdx, 'value', value)}
+            setFilter={value => { 
+              for (let i = 0; i < filters.length; ++i){
+                if (filters[i].fieldType === 'timestamp') {
+                  setFilter(i, 'value', value);
+                }
+              } } }
             isAnyFilterAnimating={isAnyFilterAnimating}
             updateAnimationSpeed={(speed) => updateAnimationSpeed(enlargedIdx, speed)}
             toggleAnimation={() => toggleAnimation(enlargedIdx)}
