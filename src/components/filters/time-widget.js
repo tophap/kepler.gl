@@ -166,11 +166,16 @@ export class TimeWidget extends Component {
           <TimeRangeFilter
             filter={filter}
             setFilter={value => { 
-              for (let i = 0; i < filters.length; ++i){
-                if (filters[i].fieldType === 'timestamp') {
-                  setFilter(i, 'value', value);
+              if (filter.fieldType === 'timestamp') {
+                for (let i = 0; i < filters.length; ++i){
+                  if (filters[i].fieldType === 'timestamp') {
+                    setFilter(i, 'value', value);
+                  }
                 }
-              } } }
+              } else {
+                setFilter(enlargedIdx, 'value', value);
+              }
+               } }
             isAnyFilterAnimating={isAnyFilterAnimating}
             updateAnimationSpeed={(speed) => updateAnimationSpeed(enlargedIdx, speed)}
             toggleAnimation={() => toggleAnimation(enlargedIdx)}
