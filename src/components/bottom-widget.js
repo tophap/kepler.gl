@@ -69,6 +69,7 @@ export default function BottomWidgetFactory(TimeWidget) {
           width={Math.min(MaxWidth, enlargedFilterWidth)}
           isAnyFilterAnimating={isAnyFilterAnimating}
           enlargedIdx={enlargedFilterIdx}
+          filters={filters}
           filter={filters[enlargedFilterIdx]}
         />
       );

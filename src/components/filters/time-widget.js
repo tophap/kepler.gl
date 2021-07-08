@@ -27,6 +27,7 @@ import {SelectTextBold, IconRoundSmall, CenterFlexbox} from 'components/common/s
 import TimeRangeFilter from 'components/filters/time-range-filter';
 import {Close, Clock, LineChart} from 'components/common/icons';
 import {TIME_ANIMATION_SPEED} from 'utils/filter-utils';
+import ItemSelector from 'components/common/item-selector/item-selector';
 const innerPdSide = 32;
 
 const WidgetContainer = styled.div`
@@ -118,6 +119,7 @@ export class TimeWidget extends Component {
     const {
       enlargedIdx,
       enlargeFilter,
+      filters,
       filter,
       isAnyFilterAnimating,
       setFilter,
@@ -135,7 +137,16 @@ export class TimeWidget extends Component {
               <CenterFlexbox className="bottom-widget__icon">
                 <Clock height="15px"/>
               </CenterFlexbox>
-              <SelectTextBold>{filter.name}</SelectTextBold>
+              <ItemSelector
+                selectedItems={[filter.name]}
+                options={filters.map(filter=>filter.name)}
+                multiSelect={false}
+                searchable={false}
+                onChange={(name)=>{
+                  if (name !== filter.name)
+                    enlargeFilter(filters.findIndex(f=>f.name === name));
+                }}
+              />
             </StyledTitle>
             <StyledTitle className="bottom-widget__y-axis">
               <CenterFlexbox className="bottom-widget__icon">
@@ -164,7 +175,12 @@ export class TimeWidget extends Component {
           </TopSectionWrapper>
           <TimeRangeFilter
             filter={filter}
-            setFilter={value => setFilter(enlargedIdx, 'value', value)}
+            setFilter={value => { 
+              for (let i = 0; i < filters.length; ++i){
+                if (filters[i].fieldType === 'timestamp') {
+                  setFilter(i, 'value', value);
+                }
+              } } }
             isAnyFilterAnimating={isAnyFilterAnimating}
             updateAnimationSpeed={(speed) => updateAnimationSpeed(enlargedIdx, speed)}
             toggleAnimation={() => toggleAnimation(enlargedIdx)}
